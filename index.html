@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpends - Budget Tracker</title>
+    <title>SmartSpends - GCC Edition</title>
     <style>
         :root {
             --bg-color: #064e3b;
@@ -40,7 +40,6 @@
             margin: 0;
             color: var(--accent-gold);
         }
-        /* Smaller width for language dropdown */
         .lang-select {
             background-color: #022c22;
             color: var(--accent-gold);
@@ -52,7 +51,6 @@
             max-width: 110px;
             outline: none;
         }
-        /* Fancy Bottom Navigation Tabs */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -91,7 +89,6 @@
         .tab-content.active {
             display: block;
         }
-        /* Hero Card */
         .hero-card {
             background: linear-gradient(135deg, #047857, #065f46);
             padding: 20px;
@@ -139,7 +136,6 @@
             font-weight: bold;
             color: var(--accent-gold);
         }
-        /* Round, red button for Set Budget */
         .btn-red-round {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: #fff;
@@ -154,10 +150,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-            transition: all 0.2s ease;
-        }
-        .btn-red-round:active {
-            transform: scale(0.92);
         }
         .box {
             background-color: var(--card-bg);
@@ -241,7 +233,6 @@
         .edit-btn { background-color: var(--accent-gold); color: #064e3b; font-weight: bold; }
         .del-btn { background-color: #ef4444; color: #fff; font-weight: bold; }
         
-        /* Modal Popup */
         .modal {
             display: none;
             position: fixed;
@@ -259,7 +250,6 @@
             max-width: 350px;
             border: 1px solid var(--border-color);
         }
-
         .tally-table {
             width: 100%;
             border-collapse: collapse;
@@ -267,20 +257,17 @@
             border-radius: 10px;
             overflow: hidden;
             border: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
         }
         .tally-table th, .tally-table td {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid var(--border-color);
             text-align: left;
         }
         .tally-table th {
             background-color: #047857;
             color: var(--accent-gold);
-        }
-        .tally-total {
-            font-weight: bold;
-            background-color: #022c22;
         }
     </style>
 </head>
@@ -292,19 +279,6 @@
         <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
             <option value="en">English</option>
             <option value="hi">हिंदी</option>
-            <option value="mr">मराठी</option>
-            <option value="gu">ગુજરાતી</option>
-            <option value="bn">বাংলা</option>
-            <option value="pa">ਪੰਜਾਬੀ</option>
-            <option value="ta">தமிழ்</option>
-            <option value="te">తెలుగు</option>
-            <option value="ur">اردو</option>
-            <option value="ru">Русский</option>
-            <option value="zh">中文</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="ja">日本語</option>
             <option value="ar">العربية</option>
         </select>
     </div>
@@ -312,14 +286,19 @@
     <!-- TAB 1: DASHBOARD -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="hero-card">
-            <div class="hero-title" id="lblTrackerTitle">SAVEIT · BUDGET TRACKER</div>
-            <div style="font-size:0.85rem; font-weight:600; margin-bottom:2px; opacity:0.95;" id="lblCurrentBalance">Current Balance</div>
+            <div class="hero-title" id="lblTrackerTitle">GCC · BUDGET TRACKER</div>
+            <div style="font-size:0.85rem; font-weight:600; margin-bottom:2px;" id="lblCurrentBalance">Current Balance</div>
             <div class="hero-balance" id="dashBalance">0</div>
             <div class="hero-grid">
                 <div><span id="lblIncome">↓ Income</span><strong id="dashIncome" style="color:#34d399;">0</strong></div>
                 <div><span id="lblExpenses">↑ Expenses</span><strong id="dashExpense" style="color:#f87171;">0</strong></div>
                 <div><span id="lblSaved">📈 Saved</span><strong id="dashSaved">0%</strong></div>
             </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:14px;">
+            <select id="filterYear" onchange="updateUI()" style="margin:0;"></select>
+            <select id="filterMonth" onchange="updateUI()" style="margin:0;"></select>
         </div>
 
         <div class="section-header">
@@ -340,6 +319,12 @@
                 <option value="income" id="optIncome">Income</option>
             </select>
             <select id="txCategory"></select>
+            <div style="display:flex; gap:8px;">
+                <div>
+                    <label style="font-size:0.75rem;">Date</label>
+                    <input type="date" id="txDate" required style="margin-bottom:10px;">
+                </div>
+            </div>
             <button type="submit" class="action-btn" id="formSubmitBtn">Add Transaction</button>
         </form>
         <ul id="txList" style="list-style:none; padding:0; margin:0;"></ul>
@@ -365,101 +350,78 @@
         <div id="budgetsListContainer"></div>
     </div>
 
-    <!-- TAB 4: CATEGORIES & SETTINGS -->
+    <!-- TAB 4: SETTINGS & BACKUP -->
     <div id="tab-categories" class="tab-content">
-        <!-- Country Selection Section -->
-        <div class="section-title" style="margin-bottom:12px;" id="lblCountrySection">Select Country</div>
+        <div class="section-title" style="margin-bottom:12px;" id="lblCountrySection">Select GCC Country</div>
         <div class="box">
-            <label style="font-size:0.85rem; font-weight:600; color:#f3f4f6;" id="lblCountryLabel">Your Country / Region</label>
+            <label style="font-size:0.85rem; font-weight:600;" id="lblCountryLabel">Country / Region</label>
             <select id="countrySelect" onchange="onCountryChange(this.value)">
-                <option value="AE">United Arab Emirates (UAE)</option>
-                <option value="IN">India</option>
-                <option value="US">United States</option>
-                <option value="GB">United Kingdom</option>
-                <option value="EU">European Union</option>
-                <option value="JP">Japan</option>
-                <option value="CN">China</option>
-                <option value="AU">Australia</option>
-                <option value="CA">Canada</option>
-                <option value="RU">Russia</option>
-                <option value="OTHER">Other Country / Custom</option>
+                <option value="AE">United Arab Emirates (AED - د.إ)</option>
+                <option value="SA">Saudi Arabia (SAR - ر.س)</option>
+                <option value="QA">Qatar (QAR - ر.ق)</option>
+                <option value="KW">Kuwait (KWD - د.ك)</option>
+                <option value="OM">Oman (OMR - ر.ع.)</option>
+                <option value="BH">Bahrain (BHD - د.ب)</option>
+                <option value="IN">India (INR - ₹)</option>
+                <option value="US">United States (USD - $)</option>
             </select>
         </div>
 
-        <!-- Currency Selection Section -->
-        <div class="section-title" style="margin-bottom:12px;" id="lblCurrencySection">Select Currency</div>
-        <div class="box">
-            <label style="font-size:0.85rem; font-weight:600; color:#f3f4f6;" id="lblCurrencyLabel">Choose Currency Symbol</label>
-            <select id="currencySelect" onchange="onCurrencySelectChange(this.value)">
-                <option value="د.إ">د.إ (AED - UAE Dirham)</option>
-                <option value="₹">₹ (INR - Indian Rupee)</option>
-                <option value="$">$ (USD - US Dollar)</option>
-                <option value="€">€ (EUR - Euro)</option>
-                <option value="£">£ (GBP - British Pound)</option>
-                <option value="¥">¥ (JPY/CNY - Yen / Yuan)</option>
-                <option value="A$">A$ (AUD - Australian Dollar)</option>
-                <option value="C$">C$ (CAD - Canadian Dollar)</option>
-                <option value="₽">₽ (RUB - Russian Ruble)</option>
-            </select>
-
-            <label style="font-size:0.85rem; font-weight:600; color:#f3f4f6; margin-top:10px; display:block;" id="lblCustomCurrency">Or Type Custom Symbol/Code</label>
-            <input type="text" id="customCurrencyInput" placeholder="e.g. Kč, R$, Rp, kr, ₦" oninput="applyCustomCurrency(this.value)">
+        <div class="section-title" style="margin-bottom:12px;" id="lblBackupSection">Data & 3-Year Archive</div>
+        <div class="box" style="display:flex; flex-direction:column; gap:8px;">
+            <button class="action-btn" onclick="exportDataJson()">📥 Export Data (JSON)</button>
+            <button style="background:#047857; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importDataJson(event)">
         </div>
 
         <div class="section-title" style="margin-bottom:12px;" id="lblCategoriesLimits">Categories & Limits</div>
         <form id="catForm" class="box" style="margin-bottom:14px;">
             <input type="hidden" id="editCatIndex" value="">
-            <input type="text" id="catNameInput" placeholder="Category Name (e.g. Dining)" required style="margin-bottom:10px;">
-            <input type="number" id="catLimitInput" placeholder="Initial Monthly Limit" step="any" required style="margin-bottom:10px;">
+            <input type="text" id="catNameInput" placeholder="Category Name" required style="margin-bottom:10px;">
+            <input type="number" id="catLimitInput" placeholder="Monthly Limit" step="any" required style="margin-bottom:10px;">
             <button type="submit" class="action-btn" id="catSubmitBtn">Add Category</button>
         </form>
         <ul id="categoryList" style="list-style:none; padding:0; margin:0;"></ul>
     </div>
 
-    <!-- TAB 5: AUDIT (TALLY STYLE) -->
+    <!-- TAB 5: AUDIT (MONTHLY & YEARLY DETAILS) -->
     <div id="tab-audit" class="tab-content">
-        <div class="section-title" style="margin-bottom:12px;" id="lblAuditTitle">Audit Balance Sheet</div>
-        <table class="tally-table">
+        <div class="section-title" style="margin-bottom:12px;" id="lblAuditTitle">Audit (Past 3 Years)</div>
+        
+        <div style="font-size:0.95rem; font-weight:bold; color:var(--accent-gold); margin-bottom:6px;">Yearly Summary</div>
+        <table class="tally-table" id="yearlyTable">
             <thead>
-                <tr>
-                    <th id="lblLiabilities">Liabilities & Equity</th>
-                    <th id="lblAssets">Assets & Inflows</th>
-                </tr>
+                <tr><th>Year</th><th>Income</th><th>Expense</th><th>Net</th></tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><span id="lblNetCapital">Net Capital / Income</span><br><span id="bsEquity" style="color:#34d399; font-weight:bold;">0</span></td>
-                    <td><span id="lblCurrentCash">Current Cash Balance</span><br><span id="bsAsset" style="color:var(--accent-gold); font-weight:bold;">0</span></td>
-                </tr>
-                <tr class="tally-total">
-                    <td>Total: <span id="bsTotalLiab">0</span></td>
-                    <td>Total: <span id="bsTotalAsset">0</span></td>
-                </tr>
-            </tbody>
+            <tbody></tbody>
+        </table>
+
+        <div style="font-size:0.95rem; font-weight:bold; color:var(--accent-gold); margin-bottom:6px;">Month-wise Details</div>
+        <table class="tally-table" id="monthlyTable">
+            <thead>
+                <tr><th>Month</th><th>Income</th><th>Expense</th><th>Net</th></tr>
+            </thead>
+            <tbody></tbody>
         </table>
     </div>
-
 </div>
 
-<!-- SET BUDGET MODAL POPUP -->
+<!-- SET BUDGET MODAL -->
 <div id="budgetModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h3 style="margin:0; font-size:1.1rem; color:var(--accent-gold);" id="modalTitle">Set Budget</h3>
-            <span onclick="closeBudgetModal()" style="font-size:1.2rem; cursor:pointer; color:#d1d5db;">&times;</span>
+            <h3 style="margin:0; color:var(--accent-gold);" id="modalTitle">Set Budget</h3>
+            <span onclick="closeBudgetModal()" style="font-size:1.2rem; cursor:pointer;">&times;</span>
         </div>
-        <label style="font-size:0.85rem; font-weight:600; color:#f3f4f6;" id="modalLblCategory">Category</label>
+        <label id="modalLblCategory">Category</label>
         <select id="modalCategorySelect" style="margin-bottom:10px;"></select>
-        
-        <label style="font-size:0.85rem; font-weight:600; color:#f3f4f6;" id="modalLblLimit">Monthly Limit (<span class="currSign">₹</span>)</label>
-        <input type="number" id="modalLimitInput" placeholder="e.g. 10000" style="margin-bottom:14px;" required>
-
-        <button class="action-btn" style="width:100%; padding:10px; margin-bottom:8px; font-size:0.9rem;" onclick="saveModalBudget()" id="modalBtnSave">Save Budget</button>
-        <button style="width:100%; background:transparent; border:1px solid var(--border-color); color:var(--text-color); padding:10px; border-radius:8px; cursor:pointer;" onclick="closeBudgetModal()" id="modalBtnCancel">Cancel</button>
+        <label id="modalLblLimit">Monthly Limit (<span class="currSign"></span>)</label>
+        <input type="number" id="modalLimitInput" placeholder="Limit" style="margin-bottom:14px;" required>
+        <button class="action-btn" onclick="saveModalBudget()" id="modalBtnSave">Save</button>
     </div>
 </div>
 
-<!-- FANCY BOTTOM NAVIGATION WITH SYMBOLS -->
+<!-- BOTTOM NAV -->
 <div class="nav-bar">
     <button class="nav-item active" onclick="switchTab('dashboard', this)">
         <span class="nav-icon">🏠</span> <span id="navDash">Dashboard</span>
@@ -471,7 +433,7 @@
         <span class="nav-icon">🎯</span> <span id="navBudgets">Budgets</span>
     </button>
     <button class="nav-item" onclick="switchTab('categories', this)">
-        <span class="nav-icon">🏷️</span> <span id="navCategories">Categories</span>
+        <span class="nav-icon">🏷️</span> <span id="navCategories">Settings</span>
     </button>
     <button class="nav-item" onclick="switchTab('audit', this)">
         <span class="nav-icon">📊</span> <span id="navAudit">Audit</span>
@@ -484,63 +446,24 @@
     let currentLang = localStorage.getItem('ss_lang') || 'en';
 
     let transactions = JSON.parse(localStorage.getItem('ss_transactions')) || [
-        { title: 'Housing Rent', amount: 1800, type: 'expense', category: 'Housing' },
-        { title: 'School Fees', amount: 1453, type: 'expense', category: "Kids' School" },
-        { title: 'Bike Fix', amount: 920, type: 'expense', category: 'Vehicle Repairs' },
-        { title: 'Monthly Salary', amount: 11062, type: 'income', category: 'Salary' }
+        { title: 'Rent', amount: 3500, type: 'expense', category: 'Housing', date: '2026-06-15' },
+        { title: 'Salary', amount: 15000, type: 'income', category: 'Salary', date: '2026-06-01' }
     ];
-    let categories = JSON.parse(localStorage.getItem('ss_categories')) || ['Housing', "Kids' School", 'Vehicle Repairs', 'House Repairs', 'Food', 'Salary', 'Utilities'];
-    let categoryBudgets = JSON.parse(localStorage.getItem('ss_budgets')) || { 'Housing': 2500, "Kids' School": 3000, 'Vehicle Repairs': 2000, 'House Repairs': 1000, 'Food': 500, 'Utilities': 3000 };
-
-    document.getElementById('countrySelect').value = currentCountry;
-    document.getElementById('currencySelect').value = ['د.إ', '₹', '$', '€', '£', '¥', 'A$', 'C$', '₽'].includes(currentCurrency) ? currentCurrency : '';
-    document.getElementById('customCurrencyInput').value = currentCurrency;
-    document.getElementById('langSelect').value = currentLang;
+    let categories = JSON.parse(localStorage.getItem('ss_categories')) || ['Housing', 'Food', 'Utilities', 'Transport', 'Salary'];
+    let categoryBudgets = JSON.parse(localStorage.getItem('ss_budgets')) || { 'Housing': 4000, 'Food': 1500, 'Utilities': 800, 'Transport': 1000 };
 
     const countryCurrencyMap = {
-        'AE': 'د.إ',
-        'IN': '₹',
-        'US': '$',
-        'GB': '£',
-        'EU': '€',
-        'JP': '¥',
-        'CN': '¥',
-        'AU': 'A$',
-        'CA': 'C$',
-        'RU': '₽'
+        'AE': 'د.إ', 'SA': 'ر.س', 'QA': 'ر.ق', 'KW': 'د.ك', 'OM': 'ر.ع.', 'BH': 'د.ب', 'IN': '₹', 'US': '$'
     };
 
+    document.getElementById('countrySelect').value = currentCountry;
+    document.getElementById('langSelect').value = currentLang;
+    document.getElementById('txDate').valueAsDate = new Date();
+
     const translations = {
-        en: {
-            dash: "Dashboard", tx: "Transactions", budgets: "Budgets", categories: "Categories", audit: "Audit",
-            trackerTitle: "SAVEIT · BUDGET TRACKER", currentBalance: "Current Balance", income: "↓ Income", expenses: "↑ Expenses", saved: "📈 Saved",
-            catBreakdown: "Category Breakdown", manageTx: "Manage Transactions", optExpense: "Expense", optIncome: "Income",
-            addTx: "Add Transaction", updateTx: "Update Transaction", setBudgetBtn: "+ Set Budget", totalBudget: "Total Budget",
-            countrySection: "Select Country", countryLabel: "Your Country / Region", currencySection: "Select Currency", currencyLabel: "Choose Currency Symbol",
-            customCurrency: "Or Type Custom Symbol/Code", categoriesLimits: "Categories & Limits", addCat: "Add Category", updateCat: "Update Category",
-            auditTitle: "Audit Balance Sheet", liabilities: "Liabilities & Equity", assets: "Assets & Inflows", netCapital: "Net Capital / Income", currentCash: "Current Cash Balance",
-            modalTitle: "Set Budget", modalCategory: "Category", modalLimit: "Monthly Limit", saveBudget: "Save Budget", cancel: "Cancel"
-        },
-        hi: {
-            dash: "डैशबोर्ड", tx: "लेन-देन", budgets: "बजट", categories: "श्रेणियाँ", audit: "ऑडिट",
-            trackerTitle: "सेवइट · बजट ट्रैकर", currentBalance: "वर्तमान शेष राशि", income: "↓ आय", expenses: "↑ खर्च", saved: "📈 बचत",
-            catBreakdown: "श्रेणीवार विवरण", manageTx: "लेन-देन प्रबंधित करें", optExpense: "खर्च", optIncome: "आय",
-            addTx: "लेन-देन जोड़ें", updateTx: "लेन-देन अपडेट करें", setBudgetBtn: "+ बजट सेट करें", totalBudget: "कुल बजट",
-            countrySection: "देश चुनें", countryLabel: "आपका देश / क्षेत्र", currencySection: "मुद्रा चुनें", currencyLabel: "मुद्रा प्रतीक चुनें",
-            customCurrency: "या कस्टम प्रतीक टाइप करें", categoriesLimits: "श्रेणियाँ और सीमाएँ", addCat: "श्रेणी जोड़ें", updateCat: "श्रेणी अपडेट करें",
-            auditTitle: "ऑडिट बैलेंस शीट", liabilities: "देयताएं और इक्विटी", assets: "परिसंपत्तियां और प्रवाह", netCapital: "शुद्ध पूंजी / आय", currentCash: "वर्तमान नकद शेष",
-            modalTitle: "बजट सेट करें", modalCategory: "श्रेणी", modalLimit: "मासिक सीमा", saveBudget: "बजट सहेजें", cancel: "रद्द करें"
-        },
-        ar: {
-            dash: "لوحة القيادة", tx: "المعاملات", budgets: "الميزانيات", categories: "الفئات", audit: "تدقيق",
-            trackerTitle: "SAVEIT · متعقب الميزانية", currentBalance: "الرصيد الحالي", income: "↓ الدخل", expenses: "↑ المصروفات", saved: "📈 المدخرات",
-            catBreakdown: "توزيع الفئات", manageTx: "إدارة المعاملات", optExpense: "مصروف", optIncome: "دخل",
-            addTx: "إضافة معاملة", updateTx: "تحديث المعاملة", setBudgetBtn: "+ تعيين الميزانية", totalBudget: "إجمالي الميزانية",
-            countrySection: "اختر الدولة", countryLabel: "دلتك أو منطقتك", currencySection: "اختر العملة", currencyLabel: "رمز العملة",
-            customCurrency: "أو اكتب رمز مخصص", categoriesLimits: "الفئات والحدود", addCat: "إضافة فئة", updateCat: "تحديث الفئة",
-            auditTitle: "ميزانية التدقيق", liabilities: "الالتزامات وحقوق الملكية", assets: "الأصول والتدفقات", netCapital: "صافي رأس المال / الدخل", currentCash: "رصيد النقد الحالي",
-            modalTitle: "تعيين الميزانية", modalCategory: "الفئة", modalLimit: "الحد الشهري", saveBudget: "حفظ الميزانية", cancel: "إلغاء"
-        }
+        en: { dash: "Dashboard", tx: "Transactions", budgets: "Budgets", categories: "Settings", audit: "Audit" },
+        hi: { dash: "डैशबोर्ड", tx: "लेन-देन", budgets: "बजट", categories: "सेटिंग्स", audit: "ऑडिट" },
+        ar: { dash: "الرئيسية", tx: "المعاملات", budgets: "الميزانيات", categories: "الإعدادات", audit: "تدقيق" }
     };
 
     function changeLanguage(lang) {
@@ -556,50 +479,6 @@
         document.getElementById('navBudgets').textContent = t.budgets;
         document.getElementById('navCategories').textContent = t.categories;
         document.getElementById('navAudit').textContent = t.audit;
-
-        document.getElementById('lblTrackerTitle').textContent = t.trackerTitle;
-        document.getElementById('lblCurrentBalance').textContent = t.currentBalance;
-        document.getElementById('lblIncome').textContent = t.income;
-        document.getElementById('lblExpenses').textContent = t.expenses;
-        document.getElementById('lblSaved').textContent = t.saved;
-        document.getElementById('lblCatBreakdown').textContent = t.catBreakdown;
-
-        document.getElementById('lblManageTx').textContent = t.manageTx;
-        document.getElementById('optExpense').textContent = t.optExpense;
-        document.getElementById('optIncome').textContent = t.optIncome;
-        if(document.getElementById('editIndex').value === '') {
-            document.getElementById('formSubmitBtn').textContent = t.addTx;
-        } else {
-            document.getElementById('formSubmitBtn').textContent = t.updateTx;
-        }
-
-        document.getElementById('lblBudgetsTitle').textContent = t.budgets;
-        document.getElementById('lblTotalBudget').textContent = t.totalBudget;
-
-        document.getElementById('lblCountrySection').textContent = t.countrySection;
-        document.getElementById('lblCountryLabel').textContent = t.countryLabel;
-        document.getElementById('lblCurrencySection').textContent = t.currencySection;
-        document.getElementById('lblCurrencyLabel').textContent = t.currencyLabel;
-        document.getElementById('lblCustomCurrency').textContent = t.customCurrency;
-        document.getElementById('lblCategoriesLimits').textContent = t.categoriesLimits;
-        
-        if(document.getElementById('editCatIndex').value === '') {
-            document.getElementById('catSubmitBtn').textContent = t.addCat;
-        } else {
-            document.getElementById('catSubmitBtn').textContent = t.updateCat;
-        }
-
-        document.getElementById('lblAuditTitle').textContent = t.auditTitle;
-        document.getElementById('lblLiabilities').textContent = t.liabilities;
-        document.getElementById('lblAssets').textContent = t.assets;
-        document.getElementById('lblNetCapital').textContent = t.netCapital;
-        document.getElementById('lblCurrentCash').textContent = t.currentCash;
-
-        document.getElementById('modalTitle').textContent = t.modalTitle;
-        document.getElementById('modalLblCategory').textContent = t.modalCategory;
-        document.getElementById('modalLblLimit').innerHTML = `${t.modalLimit} (<span class="currSign">${currentCurrency}</span>)`;
-        document.getElementById('modalBtnSave').textContent = t.saveBudget;
-        document.getElementById('modalBtnCancel').textContent = t.cancel;
     }
 
     function switchTab(tabName, btnElement) {
@@ -610,36 +489,38 @@
         updateUI();
     }
 
-    function onCountryChange(countryCode) {
-        currentCountry = countryCode;
+    function onCountryChange(code) {
+        currentCountry = code;
+        currentCurrency = countryCurrencyMap[code] || '$';
         localStorage.setItem('ss_country', currentCountry);
-
-        if (countryCurrencyMap[countryCode]) {
-            currentCurrency = countryCurrencyMap[countryCode];
-            document.getElementById('currencySelect').value = currentCurrency;
-            document.getElementById('customCurrencyInput').value = currentCurrency;
-            localStorage.setItem('ss_currency', currentCurrency);
-            updateUI();
-        }
+        localStorage.setItem('ss_currency', currentCurrency);
+        updateUI();
     }
 
-    function onCurrencySelectChange(val) {
-        if(val) {
-            currentCurrency = val;
-            document.getElementById('customCurrencyInput').value = currentCurrency;
-            localStorage.setItem('ss_currency', currentCurrency);
-            updateUI();
-        }
-    }
+    function initDateFilters() {
+        const yearSelect = document.getElementById('filterYear');
+        const monthSelect = document.getElementById('filterMonth');
+        
+        let currentYear = new Date().getFullYear();
+        let years = [currentYear, currentYear - 1, currentYear - 2]; // Past 3 years
 
-    function applyCustomCurrency(val) {
-        let typedVal = val.trim();
-        if(typedVal !== '') {
-            currentCurrency = typedVal;
-            localStorage.setItem('ss_currency', currentCurrency);
-            document.getElementById('currencySelect').value = '';
-            updateUI();
-        }
+        let yHtml = '<option value="all">All Years</option>';
+        years.forEach(y => { yHtml += `<option value="${y}">${y}</option>`; });
+        let prevY = yearSelect.value;
+        yearSelect.innerHTML = yHtml;
+        if(prevY) yearSelect.value = prevY;
+
+        const months = [
+            {val: 'all', name: 'All Months'}, {val: '01', name: 'January'}, {val: '02', name: 'February'},
+            {val: '03', name: 'March'}, {val: '04', name: 'April'}, {val: '05', name: 'May'},
+            {val: '06', name: 'June'}, {val: '07', name: 'July'}, {val: '08', name: 'August'},
+            {val: '09', name: 'September'}, {val: '10', name: 'October'}, {val: '11', name: 'November'}, {val: '12', name: 'December'}
+        ];
+        let mHtml = '';
+        months.forEach(m => { mHtml += `<option value="${m.val}">${m.name}</option>`; });
+        let prevM = monthSelect.value;
+        monthSelect.innerHTML = mHtml;
+        if(prevM) monthSelect.value = prevM;
     }
 
     function updateDropdowns() {
@@ -650,21 +531,10 @@
 
         categories.forEach(cat => {
             if (cat === 'Salary') return;
-            const opt1 = document.createElement('option');
-            opt1.value = cat;
-            opt1.textContent = cat;
-            select.appendChild(opt1);
-
-            const opt2 = document.createElement('option');
-            opt2.value = cat;
-            opt2.textContent = cat;
-            modalSelect.appendChild(opt2);
+            select.add(new Option(cat, cat));
+            modalSelect.add(new Option(cat, cat));
         });
-        
-        const salaryOpt = document.createElement('option');
-        salaryOpt.value = 'Salary';
-        salaryOpt.textContent = 'Salary';
-        select.appendChild(salaryOpt);
+        select.add(new Option('Salary', 'Salary'));
     }
 
     function openBudgetModal() {
@@ -679,240 +549,293 @@
 
     function saveModalBudget() {
         const cat = document.getElementById('modalCategorySelect').value;
-        const limitVal = parseFloat(document.getElementById('modalLimitInput').value);
-        if (!isNaN(limitVal)) {
-            categoryBudgets[cat] = limitVal;
+        const val = parseFloat(document.getElementById('modalLimitInput').value);
+        if (!isNaN(val)) {
+            categoryBudgets[cat] = val;
             closeBudgetModal();
             updateUI();
-        } else {
-            alert('Please enter a valid amount');
         }
     }
 
     function updateUI() {
+        initDateFilters();
         updateDropdowns();
         applyTranslations();
-        let income = 0;
-        let expense = 0;
+
+        let selYear = document.getElementById('filterYear').value;
+        let selMonth = document.getElementById('filterMonth').value;
+
+        let filtered = transactions.filter(t => {
+            if(!t.date) return true;
+            let [y, m, d] = t.date.split('-');
+            if(selYear !== 'all' && y !== selYear) return false;
+            if(selMonth !== 'all' && m !== selMonth) return false;
+            return true;
+        });
+
+        let income = 0, expense = 0;
         let catSpending = {};
+        categories.forEach(c => catSpending[c] = 0);
 
-        categories.forEach(cat => catSpending[cat] = 0);
-
-        transactions.forEach(t => {
+        filtered.forEach(t => {
             let amt = parseFloat(t.amount) || 0;
             if (t.type === 'income') {
                 income += amt;
             } else {
                 expense += amt;
-                if (catSpending[t.category] !== undefined) {
-                    catSpending[t.category] += amt;
-                }
+                if (catSpending[t.category] !== undefined) catSpending[t.category] += amt;
             }
         });
 
         let balance = income - expense;
         let savedPercent = income > 0 ? Math.max(0, Math.round((balance / income) * 100)) : 0;
 
-        document.getElementById('dashBalance').textContent = `${currentCurrency}${balance.toLocaleString()}`;
-        document.getElementById('dashIncome').textContent = `${currentCurrency}${income.toLocaleString()}`;
-        document.getElementById('dashExpense').textContent = `${currentCurrency}${expense.toLocaleString()}`;
+        document.getElementById('dashBalance').textContent = `${currentCurrency} ${balance.toLocaleString()}`;
+        document.getElementById('dashIncome').textContent = `${currentCurrency} ${income.toLocaleString()}`;
+        document.getElementById('dashExpense').textContent = `${currentCurrency} ${expense.toLocaleString()}`;
         document.getElementById('dashSaved').textContent = `${savedPercent}%`;
 
-        let breakdownHtml = '';
+        // Category Breakdown
+        let bHtml = '';
         categories.forEach(cat => {
             if (cat === 'Salary') return;
             let spent = catSpending[cat] || 0;
             let limit = categoryBudgets[cat] || 1000;
-            let percent = Math.min(100, Math.round((spent / limit) * 100));
-
-            breakdownHtml += `
+            let pct = Math.min(100, Math.round((spent / limit) * 100));
+            bHtml += `
                 <div class="progress-card">
                     <div class="progress-header">
                         <span>${cat}</span>
-                        <span>${currentCurrency}${spent.toLocaleString()} / ${currentCurrency}${limit.toLocaleString()}</span>
+                        <span>${currentCurrency} ${spent.toLocaleString()} / ${currentCurrency} ${limit.toLocaleString()}</span>
                     </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${percent}%;"></div>
-                    </div>
-                    <div class="progress-footer">${percent}% used</div>
-                </div>
-            `;
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div>
+                    <div class="progress-footer">${pct}% used</div>
+                </div>`;
         });
-        document.getElementById('categoryBreakdownList').innerHTML = breakdownHtml;
+        document.getElementById('categoryBreakdownList').innerHTML = bHtml;
 
-        let totalSpentAll = 0;
-        let totalLimitAll = 0;
-        let budgetsHtml = '';
-
+        // Total Budgets
+        let totSpent = 0, totLimit = 0, budHtml = '';
         categories.forEach(cat => {
             if (cat === 'Salary') return;
             let spent = catSpending[cat] || 0;
             let limit = categoryBudgets[cat] || 1000;
-            totalSpentAll += spent;
-            totalLimitAll += limit;
-            let percent = Math.min(100, Math.round((spent / limit) * 100));
-
-            budgetsHtml += `
+            totSpent += spent; totLimit += limit;
+            let pct = Math.min(100, Math.round((spent / limit) * 100));
+            budHtml += `
                 <div class="progress-card">
                     <div class="progress-header">
                         <span>${cat}</span>
-                        <span>${currentCurrency}${spent.toLocaleString()} / ${currentCurrency}${limit.toLocaleString()}</span>
+                        <span>${currentCurrency} ${spent.toLocaleString()} / ${currentCurrency} ${limit.toLocaleString()}</span>
                     </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${percent}%;"></div>
-                    </div>
-                    <div class="progress-footer">${percent}% used</div>
-                </div>
-            `;
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div>
+                    <div class="progress-footer">${pct}% used</div>
+                </div>`;
         });
+        let overallPct = totLimit > 0 ? Math.min(100, Math.round((totSpent / totLimit) * 100)) : 0;
+        document.getElementById('totalBudgetValues').textContent = `${currentCurrency} ${totSpent.toLocaleString()} of ${currentCurrency} ${totLimit.toLocaleString()}`;
+        document.getElementById('totalbarFill').style.width = `${overallPct}%`;
+        document.getElementById('budgetsListContainer').innerHTML = budHtml;
 
-        let totalPercentAll = totalLimitAll > 0 ? Math.min(100, Math.round((totalSpentAll / totalLimitAll) * 100)) : 0;
-        document.getElementById('totalBudgetValues').textContent = `${currentCurrency}${totalSpentAll.toLocaleString()} of ${currentCurrency}${totalLimitAll.toLocaleString()}`;
-        document.getElementById('totalbarFill').style.width = `${totalPercentAll}%`;
-        document.getElementById('budgetsListContainer').innerHTML = budgetsHtml;
-
+        // Transactions List
         let txHtml = '';
-        transactions.forEach((t, index) => {
+        transactions.forEach((t, idx) => {
             txHtml += `
                 <li class="list-card">
                     <div>
                         <strong>${t.title}</strong>
-                        <span>${t.category} | ${t.type.toUpperCase()}</span>
+                        <span>${t.category} | ${t.date || 'No Date'} | ${t.type.toUpperCase()}</span>
                     </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="color: ${t.type === 'income' ? '#34d399' : '#f87171'}; font-weight: bold; margin-right: 8px;">
-                            ${t.type === 'income' ? '+' : '-'}${currentCurrency}${parseFloat(t.amount).toLocaleString()}
+                    <div style="display:flex; align-items:center;">
+                        <span style="color:${t.type === 'income' ? '#34d399' : '#f87171'}; font-weight:bold; margin-right:8px;">
+                            ${t.type === 'income' ? '+' : '-'}${currentCurrency} ${parseFloat(t.amount).toLocaleString()}
                         </span>
                         <div class="btn-group">
-                            <button class="edit-btn" onclick="editTransaction(${index})">Edit</button>
-                            <button class="del-btn" onclick="deleteTransaction(${index})">Del</button>
+                            <button class="edit-btn" onclick="editTx(${idx})">Edit</button>
+                            <button class="del-btn" onclick="delTx(${idx})">Del</button>
                         </div>
                     </div>
-                </li>
-            `;
+                </li>`;
         });
-        document.getElementById('txList').innerHTML = txHtml || '<p style="text-align:center; color:#d1d5db;">No transactions added yet.</p>';
+        document.getElementById('txList').innerHTML = txHtml || '<p style="text-align:center;">No records.</p>';
 
-        let catListHtml = '';
+        // Categories List
+        let catHtml = '';
         categories.forEach((cat, idx) => {
-            let limitDisplay = cat === 'Salary' ? 'Income Source' : `Limit: ${currentCurrency}${(categoryBudgets[cat] || 1000).toLocaleString()}`;
-            catListHtml += `
+            let limitTxt = cat === 'Salary' ? 'Source' : `Limit: ${currentCurrency} ${(categoryBudgets[cat]||1000).toLocaleString()}`;
+            catHtml += `
                 <li class="list-card">
-                    <div>
-                        <strong>${cat}</strong>
-                        <span>${limitDisplay}</span>
-                    </div>
+                    <div><strong>${cat}</strong><span>${limitTxt}</span></div>
                     <div class="btn-group">
-                        <button class="edit-btn" onclick="editCategory(${idx})">Edit</button>
-                        <button class="del-btn" onclick="deleteCategory(${idx})">Del</button>
+                        <button class="edit-btn" onclick="editCat(${idx})">Edit</button>
+                        <button class="del-btn" onclick="delCat(${idx})">Del</button>
                     </div>
-                </li>
-            `;
+                </li>`;
         });
-        document.getElementById('categoryList').innerHTML = catListHtml;
+        document.getElementById('categoryList').innerHTML = catHtml;
 
-        document.getElementById('bsEquity').textContent = `${currentCurrency}${balance.toLocaleString()}`;
-        document.getElementById('bsAsset').textContent = `${currentCurrency}${balance.toLocaleString()}`;
-        document.getElementById('bsTotalLiab').textContent = `${currentCurrency}${balance.toLocaleString()}`;
-        document.getElementById('bsTotalAsset').textContent = `${currentCurrency}${balance.toLocaleString()}`;
+        // AUDIT (Yearly & Monthly over 3 Years)
+        generateAuditTables();
 
         localStorage.setItem('ss_transactions', JSON.stringify(transactions));
         localStorage.setItem('ss_categories', JSON.stringify(categories));
         localStorage.setItem('ss_budgets', JSON.stringify(categoryBudgets));
     }
 
-    const txForm = document.getElementById('txForm');
-    txForm.addEventListener('submit', (e) => {
+    function generateAuditTables() {
+        let yearlyData = {};
+        let monthlyData = {};
+
+        transactions.forEach(t => {
+            if(!t.date) return;
+            let [y, m] = t.date.split('-');
+            let amt = parseFloat(t.amount) || 0;
+
+            // Yearly
+            if(!yearlyData[y]) yearlyData[y] = { inc: 0, exp: 0 };
+            if(t.type === 'income') yearlyData[y].inc += amt; else yearlyData[y].exp += amt;
+
+            // Monthly
+            let ym = `${y}-${m}`;
+            if(!monthlyData[ym]) monthlyData[ym] = { inc: 0, exp: 0 };
+            if(t.type === 'income') monthlyData[ym].inc += amt; else monthlyData[ym].exp += amt;
+        });
+
+        // Fill Yearly Table
+        let yTableHtml = '';
+        Object.keys(yearlyData).sort().reverse().forEach(y => {
+            let d = yearlyData[y];
+            let net = d.inc - d.exp;
+            yTableHtml += `<tr><td>${y}</td><td style="color:#34d399">+${currentCurrency} ${d.inc.toLocaleString()}</td><td style="color:#f87171">-${currentCurrency} ${d.exp.toLocaleString()}</td><td style="font-weight:bold">${currentCurrency} ${net.toLocaleString()}</td></tr>`;
+        });
+        document.querySelector('#yearlyTable tbody').innerHTML = yTableHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
+
+        // Fill Monthly Table
+        let mTableHtml = '';
+        Object.keys(monthlyData).sort().reverse().forEach(ym => {
+            let d = monthlyData[ym];
+            let net = d.inc - d.exp;
+            mTableHtml += `<tr><td>${ym}</td><td style="color:#34d399">+${currentCurrency} ${d.inc.toLocaleString()}</td><td style="color:#f87171">-${currentCurrency} ${d.exp.toLocaleString()}</td><td style="font-weight:bold">${currentCurrency} ${net.toLocaleString()}</td></tr>`;
+        });
+        document.querySelector('#monthlyTable tbody').innerHTML = mTableHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
+    }
+
+    function exportDataJson() {
+        let exportObj = {
+            transactions, categories, categoryBudgets, currentCurrency, currentCountry
+        };
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+        let anchor = document.createElement('a');
+        anchor.setAttribute("href", dataStr);
+        anchor.setAttribute("download", `smart_spends_archive_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+    }
+
+    function importDataJson(event) {
+        let file = event.target.files[0];
+        if(!file) return;
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                let json = JSON.parse(e.target.result);
+                if(json.transactions) transactions = json.transactions;
+                if(json.categories) categories = json.categories;
+                if(json.categoryBudgets) categoryBudgets = json.categoryBudgets;
+                if(json.currentCurrency) currentCurrency = json.currentCurrency;
+                if(json.currentCountry) {
+                    currentCountry = json.currentCountry;
+                    document.getElementById('countrySelect').value = currentCountry;
+                }
+                updateUI();
+                alert('Data imported successfully!');
+            } catch(err) {
+                alert('Invalid JSON file format.');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // Form Submissions
+    document.getElementById('txForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const title = document.getElementById('txTitle').value;
-        const amount = document.getElementById('txAmount').value;
-        const type = document.getElementById('txType').value;
-        const category = document.getElementById('txCategory').value;
-        const editIndex = document.getElementById('editIndex').value;
+        let title = document.getElementById('txTitle').value;
+        let amount = document.getElementById('txAmount').value;
+        let type = document.getElementById('txType').value;
+        let category = document.getElementById('txCategory').value;
+        let date = document.getElementById('txDate').value;
+        let editIdx = document.getElementById('editIndex').value;
 
-        let tObj = translations[currentLang] || translations['en'];
-        if (editIndex === '') {
-            transactions.unshift({ title, amount, type, category });
+        if(editIdx === '') {
+            transactions.unshift({ title, amount, type, category, date });
         } else {
-            transactions[editIndex] = { title, amount, type, category };
+            transactions[editIdx] = { title, amount, type, category, date };
             document.getElementById('editIndex').value = '';
-            document.getElementById('formSubmitBtn').textContent = tObj.addTx;
+            document.getElementById('formSubmitBtn').textContent = 'Add Transaction';
         }
-
-        txForm.reset();
+        document.getElementById('txForm').reset();
+        document.getElementById('txDate').valueAsDate = new Date();
         updateUI();
     });
 
-    function editTransaction(index) {
-        const t = transactions[index];
+    function editTx(idx) {
+        let t = transactions[idx];
         document.getElementById('txTitle').value = t.title;
         document.getElementById('txAmount').value = t.amount;
         document.getElementById('txType').value = t.type;
         document.getElementById('txCategory').value = t.category;
-        document.getElementById('editIndex').value = index;
-        let tObj = translations[currentLang] || translations['en'];
-        document.getElementById('formSubmitBtn').textContent = tObj.updateTx;
+        document.getElementById('txDate').value = t.date || new Date().toISOString().slice(0,10);
+        document.getElementById('editIndex').value = idx;
+        document.getElementById('formSubmitBtn').textContent = 'Update Transaction';
         switchTab('transactions', document.querySelectorAll('.nav-item')[1]);
     }
 
-    function deleteTransaction(index) {
-        if (confirm('Delete this transaction?')) {
-            transactions.splice(index, 1);
+    function delTx(idx) {
+        if(confirm('Delete record?')) {
+            transactions.splice(idx, 1);
             updateUI();
         }
     }
 
-    const catForm = document.getElementById('catForm');
-    catForm.addEventListener('submit', (e) => {
+    document.getElementById('catForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const catName = document.getElementById('catNameInput').value.trim();
-        const catLimit = parseFloat(document.getElementById('catLimitInput').value);
-        const editIdx = document.getElementById('editCatIndex').value;
+        let name = document.getElementById('catNameInput').value.trim();
+        let limit = parseFloat(document.getElementById('catLimitInput').value) || 1000;
+        let editIdx = document.getElementById('editCatIndex').value;
 
-        let tObj = translations[currentLang] || translations['en'];
-        if (catName) {
-            if (editIdx === '') {
-                if (!categories.includes(catName)) {
-                    categories.push(catName);
-                    categoryBudgets[catName] = catLimit || 1000;
-                } else {
-                    alert('Category already exists!');
-                    return;
-                }
+        if(name) {
+            if(editIdx === '') {
+                if(!categories.includes(name)) {
+                    categories.push(name);
+                    categoryBudgets[name] = limit;
+                } else { alert('Category exists'); return; }
             } else {
-                let oldName = categories[editIdx];
-                categories[editIdx] = catName;
-                if (oldName !== catName) {
-                    categoryBudgets[catName] = catLimit || categoryBudgets[oldName] || 1000;
-                    delete categoryBudgets[oldName];
-                    transactions.forEach(t => {
-                        if (t.category === oldName) t.category = catName;
-                    });
-                } else {
-                    categoryBudgets[catName] = catLimit;
-                }
+                let old = categories[editIdx];
+                categories[editIdx] = name;
+                categoryBudgets[name] = limit;
+                if(old !== name) delete categoryBudgets[old];
                 document.getElementById('editCatIndex').value = '';
-                document.getElementById('catSubmitBtn').textContent = tObj.addCat;
+                document.getElementById('catSubmitBtn').textContent = 'Add Category';
             }
-            catForm.reset();
+            document.getElementById('catForm').reset();
             updateUI();
         }
     });
 
-    function editCategory(index) {
-        let cat = categories[index];
-        document.getElementById('catNameInput').value = cat;
-        document.getElementById('catLimitInput').value = categoryBudgets[cat] || 1000;
-        document.getElementById('editCatIndex').value = index;
-        let tObj = translations[currentLang] || translations['en'];
-        document.getElementById('catSubmitBtn').textContent = tObj.updateCat;
+    function editCat(idx) {
+        let c = categories[idx];
+        document.getElementById('catNameInput').value = c;
+        document.getElementById('catLimitInput').value = categoryBudgets[c] || 1000;
+        document.getElementById('editCatIndex').value = idx;
+        document.getElementById('catSubmitBtn').textContent = 'Update Category';
     }
 
-    function deleteCategory(index) {
-        let cat = categories[index];
-        if (confirm(`Delete category "${cat}"?`)) {
-            categories.splice(index, 1);
-            delete categoryBudgets[cat];
+    function delCat(idx) {
+        let c = categories[idx];
+        if(confirm(`Delete ${c}?`)) {
+            categories.splice(idx, 1);
+            delete categoryBudgets[c];
             updateUI();
         }
     }
