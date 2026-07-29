@@ -12,7 +12,6 @@
             --accent-green: #34d399;
             --accent-gold: #fbbf24;
             --accent-red: #ef4444;
-            --accent-blue: #38bdf8;
             --border-color: #047857;
         }
         body {
@@ -41,14 +40,12 @@
             color: var(--accent-gold);
         }
         .lang-select {
-            background-color: #022c22;
+            background-color: #047857;
             color: var(--accent-gold);
-            border: 1px solid var(--border-color);
-            padding: 3px 6px;
+            border: 1px solid var(--accent-gold);
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 0.72rem;
-            width: auto;
-            max-width: 130px;
+            font-size: 0.75rem;
             outline: none;
         }
         .nav-bar {
@@ -195,11 +192,16 @@
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: #022c22;
-            color: var(--text-color);
+            border: 1px solid var(--accent-gold);
+            background-color: #047857;
+            color: #fff;
             box-sizing: border-box;
             font-size: 0.95rem;
+            font-weight: bold;
+        }
+        select option {
+            background-color: #064e3b;
+            color: #fff;
         }
         button.action-btn {
             background-color: var(--accent-gold);
