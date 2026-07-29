@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpends - GCC Edition</title>
+    <title>SmartSpends - Complete International & GCC Edition</title>
     <style>
         :root {
             --bg-color: #064e3b;
@@ -48,7 +48,7 @@
             border-radius: 6px;
             font-size: 0.72rem;
             width: auto;
-            max-width: 110px;
+            max-width: 130px;
             outline: none;
         }
         .nav-bar {
@@ -279,6 +279,19 @@
         <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
             <option value="en">English</option>
             <option value="hi">हिंदी</option>
+            <option value="mr">मराठी</option>
+            <option value="gu">ગુજરાતી</option>
+            <option value="bn">বাংলা</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+            <option value="ur">اردو</option>
+            <option value="ru">Русский</option>
+            <option value="zh">中文</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="ja">日本語</option>
             <option value="ar">العربية</option>
         </select>
     </div>
@@ -286,7 +299,7 @@
     <!-- TAB 1: DASHBOARD -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="hero-card">
-            <div class="hero-title" id="lblTrackerTitle">GCC · BUDGET TRACKER</div>
+            <div class="hero-title" id="lblTrackerTitle">SAVEIT · BUDGET TRACKER</div>
             <div style="font-size:0.85rem; font-weight:600; margin-bottom:2px;" id="lblCurrentBalance">Current Balance</div>
             <div class="hero-balance" id="dashBalance">0</div>
             <div class="hero-grid">
@@ -319,11 +332,9 @@
                 <option value="income" id="optIncome">Income</option>
             </select>
             <select id="txCategory"></select>
-            <div style="display:flex; gap:8px;">
-                <div>
-                    <label style="font-size:0.75rem;">Date</label>
-                    <input type="date" id="txDate" required style="margin-bottom:10px;">
-                </div>
+            <div>
+                <label style="font-size:0.75rem;">Date</label>
+                <input type="date" id="txDate" required style="margin-bottom:10px;">
             </div>
             <button type="submit" class="action-btn" id="formSubmitBtn">Add Transaction</button>
         </form>
@@ -352,10 +363,11 @@
 
     <!-- TAB 4: SETTINGS & BACKUP -->
     <div id="tab-categories" class="tab-content">
-        <div class="section-title" style="margin-bottom:12px;" id="lblCountrySection">Select GCC Country</div>
+        <div class="section-title" style="margin-bottom:12px;" id="lblCountrySection">Select Country & Currency</div>
         <div class="box">
             <label style="font-size:0.85rem; font-weight:600;" id="lblCountryLabel">Country / Region</label>
             <select id="countrySelect" onchange="onCountryChange(this.value)">
+                <option value="DE">Germany (EUR - €)</option>
                 <option value="AE">United Arab Emirates (AED - د.إ)</option>
                 <option value="SA">Saudi Arabia (SAR - ر.س)</option>
                 <option value="QA">Qatar (QAR - ر.ق)</option>
@@ -364,7 +376,18 @@
                 <option value="BH">Bahrain (BHD - د.ب)</option>
                 <option value="IN">India (INR - ₹)</option>
                 <option value="US">United States (USD - $)</option>
+                <option value="GB">United Kingdom (GBP - £)</option>
+                <option value="EU">European Union (EUR - €)</option>
+                <option value="JP">Japan (JPY - ¥)</option>
+                <option value="CN">China (CNY - ¥)</option>
+                <option value="AU">Australia (AUD - A$)</option>
+                <option value="CA">Canada (CAD - C$)</option>
+                <option value="RU">Russia (RUB - ₽)</option>
+                <option value="OTHER">Other Country / Custom</option>
             </select>
+            
+            <label style="font-size:0.85rem; font-weight:600; margin-top:10px; display:block;" id="lblCustomCurrency">Or Type Custom Symbol</label>
+            <input type="text" id="customCurrencyInput" placeholder="e.g. Kč, ₦, kr" oninput="applyCustomCurrency(this.value)">
         </div>
 
         <div class="section-title" style="margin-bottom:12px;" id="lblBackupSection">Data & 3-Year Archive</div>
@@ -441,28 +464,43 @@
 </div>
 
 <script>
-    let currentCurrency = localStorage.getItem('ss_currency') || 'د.إ';
-    let currentCountry = localStorage.getItem('ss_country') || 'AE';
-    let currentLang = localStorage.getItem('ss_lang') || 'en';
+    let currentCurrency = localStorage.getItem('ss_currency') || '€';
+    let currentCountry = localStorage.getItem('ss_country') || 'DE';
+    let currentLang = localStorage.getItem('ss_lang') || 'de';
 
     let transactions = JSON.parse(localStorage.getItem('ss_transactions')) || [
-        { title: 'Rent', amount: 3500, type: 'expense', category: 'Housing', date: '2026-06-15' },
-        { title: 'Salary', amount: 15000, type: 'income', category: 'Salary', date: '2026-06-01' }
+        { title: 'Wohnungsmiete', amount: 850, type: 'expense', category: 'Housing', date: '2026-06-15' },
+        { title: 'Monatsgehalt', amount: 3200, type: 'income', category: 'Salary', date: '2026-06-01' }
     ];
     let categories = JSON.parse(localStorage.getItem('ss_categories')) || ['Housing', 'Food', 'Utilities', 'Transport', 'Salary'];
-    let categoryBudgets = JSON.parse(localStorage.getItem('ss_budgets')) || { 'Housing': 4000, 'Food': 1500, 'Utilities': 800, 'Transport': 1000 };
+    let categoryBudgets = JSON.parse(localStorage.getItem('ss_budgets')) || { 'Housing': 900, 'Food': 400, 'Utilities': 250, 'Transport': 150 };
 
     const countryCurrencyMap = {
-        'AE': 'د.إ', 'SA': 'ر.س', 'QA': 'ر.ق', 'KW': 'د.ك', 'OM': 'ر.ع.', 'BH': 'د.ب', 'IN': '₹', 'US': '$'
+        'DE': '€', 'AE': 'د.إ', 'SA': 'ر.س', 'QA': 'ر.ق', 'KW': 'د.ك', 'OM': 'ر.ع.', 'BH': 'د.ب', 
+        'IN': '₹', 'US': '$', 'GB': '£', 'EU': '€', 'JP': '¥', 'CN': '¥', 'AU': 'A$', 'CA': 'C$', 'RU': '₽'
     };
 
     document.getElementById('countrySelect').value = currentCountry;
+    document.getElementById('customCurrencyInput').value = currentCurrency;
     document.getElementById('langSelect').value = currentLang;
     document.getElementById('txDate').valueAsDate = new Date();
 
     const translations = {
         en: { dash: "Dashboard", tx: "Transactions", budgets: "Budgets", categories: "Settings", audit: "Audit" },
         hi: { dash: "डैशबोर्ड", tx: "लेन-देन", budgets: "बजट", categories: "सेटिंग्स", audit: "ऑडिट" },
+        mr: { dash: "डॅशबोर्ड", tx: "व्यवहार", budgets: "बजेट", categories: "सेटिंग्ज", audit: "ऑडिट" },
+        gu: { dash: "ડેશબોર્ડ", tx: "વ્યવહારો", budgets: "બજેટ", categories: "સેટિંગ્સ", audit: "ઓડિટ" },
+        bn: { dash: "ড্যাশবোর্ড", tx: "লেনদেন", budgets: "বাজেট", categories: "সেটিংস", audit: "অডিট" },
+        pa: { dash: "ਡੈਸ਼ਬੋਰਡ", tx: "ਲੈਣ-ਦੇਣ", budgets: "ਬਜਟ", categories: "ਸੈਟਿੰਗਾਂ", audit: "ਆਡਿਟ" },
+        ta: { dash: "டாஷ்போர்டு", tx: "பரிவர்த்தனைகள்", budgets: "பட்ஜெட்", categories: "அமைப்புகள்", audit: "தணிக்கை" },
+        te: { dash: "డాష్‌బోర్డ్", tx: "లావాదేవీలు", budgets: "బడ్జెట్", categories: "సెట్టింగ్‌లు", audit: "ఆడిట్" },
+        ur: { dash: "ڈیش بورڈ", tx: "لین دین", budgets: "بجٹ", categories: "ترتیبات", audit: "آڈٹ" },
+        ru: { dash: "Главная", tx: "Транзакции", budgets: "Бюджеты", categories: "Настройки", audit: "Аудит" },
+        zh: { dash: "仪表板", tx: "交易", budgets: "预算", categories: "设置", audit: "审计" },
+        es: { dash: "Panel", tx: "Transacciones", budgets: "Presupuestos", categories: "Ajustes", audit: "Auditoría" },
+        fr: { dash: "Tableau", tx: "Transactions", budgets: "Budgets", categories: "Paramètres", audit: "Audit" },
+        de: { dash: "Übersicht", tx: "Transaktionen", budgets: "Budgets", categories: "Einstellungen", audit: "Prüfung" },
+        ja: { dash: "ダッシュボード", tx: "取引", budgets: "予算", categories: "設定", audit: "監査" },
         ar: { dash: "الرئيسية", tx: "المعاملات", budgets: "الميزانيات", categories: "الإعدادات", audit: "تدقيق" }
     };
 
@@ -491,10 +529,22 @@
 
     function onCountryChange(code) {
         currentCountry = code;
-        currentCurrency = countryCurrencyMap[code] || '$';
         localStorage.setItem('ss_country', currentCountry);
-        localStorage.setItem('ss_currency', currentCurrency);
-        updateUI();
+        if (countryCurrencyMap[code]) {
+            currentCurrency = countryCurrencyMap[code];
+            document.getElementById('customCurrencyInput').value = currentCurrency;
+            localStorage.setItem('ss_currency', currentCurrency);
+            updateUI();
+        }
+    }
+
+    function applyCustomCurrency(val) {
+        let typed = val.trim();
+        if(typed !== '') {
+            currentCurrency = typed;
+            localStorage.setItem('ss_currency', currentCurrency);
+            updateUI();
+        }
     }
 
     function initDateFilters() {
@@ -502,7 +552,7 @@
         const monthSelect = document.getElementById('filterMonth');
         
         let currentYear = new Date().getFullYear();
-        let years = [currentYear, currentYear - 1, currentYear - 2]; // Past 3 years
+        let years = [currentYear, currentYear - 1, currentYear - 2];
 
         let yHtml = '<option value="all">All Years</option>';
         years.forEach(y => { yHtml += `<option value="${y}">${y}</option>`; });
@@ -595,7 +645,6 @@
         document.getElementById('dashExpense').textContent = `${currentCurrency} ${expense.toLocaleString()}`;
         document.getElementById('dashSaved').textContent = `${savedPercent}%`;
 
-        // Category Breakdown
         let bHtml = '';
         categories.forEach(cat => {
             if (cat === 'Salary') return;
@@ -614,7 +663,6 @@
         });
         document.getElementById('categoryBreakdownList').innerHTML = bHtml;
 
-        // Total Budgets
         let totSpent = 0, totLimit = 0, budHtml = '';
         categories.forEach(cat => {
             if (cat === 'Salary') return;
@@ -637,7 +685,6 @@
         document.getElementById('totalbarFill').style.width = `${overallPct}%`;
         document.getElementById('budgetsListContainer').innerHTML = budHtml;
 
-        // Transactions List
         let txHtml = '';
         transactions.forEach((t, idx) => {
             txHtml += `
@@ -659,7 +706,6 @@
         });
         document.getElementById('txList').innerHTML = txHtml || '<p style="text-align:center;">No records.</p>';
 
-        // Categories List
         let catHtml = '';
         categories.forEach((cat, idx) => {
             let limitTxt = cat === 'Salary' ? 'Source' : `Limit: ${currentCurrency} ${(categoryBudgets[cat]||1000).toLocaleString()}`;
@@ -674,7 +720,6 @@
         });
         document.getElementById('categoryList').innerHTML = catHtml;
 
-        // AUDIT (Yearly & Monthly over 3 Years)
         generateAuditTables();
 
         localStorage.setItem('ss_transactions', JSON.stringify(transactions));
@@ -691,17 +736,14 @@
             let [y, m] = t.date.split('-');
             let amt = parseFloat(t.amount) || 0;
 
-            // Yearly
             if(!yearlyData[y]) yearlyData[y] = { inc: 0, exp: 0 };
             if(t.type === 'income') yearlyData[y].inc += amt; else yearlyData[y].exp += amt;
 
-            // Monthly
             let ym = `${y}-${m}`;
             if(!monthlyData[ym]) monthlyData[ym] = { inc: 0, exp: 0 };
             if(t.type === 'income') monthlyData[ym].inc += amt; else monthlyData[ym].exp += amt;
         });
 
-        // Fill Yearly Table
         let yTableHtml = '';
         Object.keys(yearlyData).sort().reverse().forEach(y => {
             let d = yearlyData[y];
@@ -710,7 +752,6 @@
         });
         document.querySelector('#yearlyTable tbody').innerHTML = yTableHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
 
-        // Fill Monthly Table
         let mTableHtml = '';
         Object.keys(monthlyData).sort().reverse().forEach(ym => {
             let d = monthlyData[ym];
@@ -721,9 +762,7 @@
     }
 
     function exportDataJson() {
-        let exportObj = {
-            transactions, categories, categoryBudgets, currentCurrency, currentCountry
-        };
+        let exportObj = { transactions, categories, categoryBudgets, currentCurrency, currentCountry };
         let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
         let anchor = document.createElement('a');
         anchor.setAttribute("href", dataStr);
@@ -757,7 +796,6 @@
         reader.readAsText(file);
     }
 
-    // Form Submissions
     document.getElementById('txForm').addEventListener('submit', (e) => {
         e.preventDefault();
         let title = document.getElementById('txTitle').value;
