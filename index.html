@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartSpends - Complete International & GCC Edition</title>
+    <title>SmartSpends - International Edition</title>
     <style>
         :root {
-            --bg-color: #064e3b;
-            --card-bg: #065f46;
-            --text-color: #f0fdf4;
+            --bg-color: #0b0f19;
+            --card-bg: #161e2e;
+            --text-color: #f8fafc;
             --accent-green: #34d399;
             --accent-gold: #fbbf24;
             --accent-red: #ef4444;
             --accent-blue: #38bdf8;
-            --border-color: #047857;
+            --border-color: #283548;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -41,10 +41,10 @@
             color: var(--accent-gold);
         }
         .lang-select {
-            background-color: #022c22;
+            background-color: #1e293b;
             color: var(--accent-gold);
             border: 1px solid var(--border-color);
-            padding: 3px 6px;
+            padding: 4px 8px;
             border-radius: 6px;
             font-size: 0.72rem;
             width: auto;
@@ -56,7 +56,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: #022c22;
+            background-color: #121826;
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
@@ -66,7 +66,7 @@
         .nav-item {
             background: none;
             border: none;
-            color: #9ca3af;
+            color: #94a3b8;
             font-size: 0.65rem;
             cursor: pointer;
             text-align: center;
@@ -90,13 +90,13 @@
             display: block;
         }
         .hero-card {
-            background: linear-gradient(135deg, #047857, #065f46);
+            background: linear-gradient(135deg, #1e293b, #0f172a);
             padding: 20px;
             border-radius: 16px;
             color: #fff;
             margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.2);
-            border: 1px solid #10b981;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
         }
         .hero-title {
             font-size: 0.9rem;
@@ -116,14 +116,14 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             font-size: 0.85rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 10px;
         }
         .hero-grid div span {
             display: block;
             font-size: 0.78rem;
             font-weight: 500;
-            opacity: 0.9;
+            opacity: 0.8;
         }
         .section-header {
             display: flex;
@@ -173,7 +173,7 @@
             font-weight: bold;
         }
         .progress-bar-bg {
-            background-color: #047857;
+            background-color: #283548;
             border-radius: 6px;
             height: 8px;
             width: 100%;
@@ -188,7 +188,7 @@
         .progress-footer {
             font-size: 0.82rem;
             font-weight: 500;
-            color: #e5e7eb;
+            color: #94a3b8;
         }
         input, select, button {
             width: 100%;
@@ -196,14 +196,15 @@
             margin-bottom: 10px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            background-color: #022c22;
+            background-color: #0f172a;
             color: var(--text-color);
             box-sizing: border-box;
             font-size: 0.95rem;
+            outline: none;
         }
         button.action-btn {
-            background-color: var(--accent-gold);
-            color: #064e3b;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: #0b0f19;
             font-weight: bold;
             cursor: pointer;
             border: none;
@@ -222,7 +223,7 @@
             display: block;
             font-size: 0.82rem;
             font-weight: 500;
-            color: #e5e7eb;
+            color: #94a3b8;
         }
         .btn-group button {
             width: auto;
@@ -230,7 +231,7 @@
             margin-left: 4px;
             font-size: 0.75rem;
         }
-        .edit-btn { background-color: var(--accent-gold); color: #064e3b; font-weight: bold; }
+        .edit-btn { background-color: var(--accent-gold); color: #0b0f19; font-weight: bold; }
         .del-btn { background-color: #ef4444; color: #fff; font-weight: bold; }
         
         .modal {
@@ -266,7 +267,7 @@
             text-align: left;
         }
         .tally-table th {
-            background-color: #047857;
+            background-color: #1e293b;
             color: var(--accent-gold);
         }
     </style>
@@ -393,7 +394,7 @@
         <div class="section-title" style="margin-bottom:12px;" id="lblBackupSection">Data & 3-Year Archive</div>
         <div class="box" style="display:flex; flex-direction:column; gap:8px;">
             <button class="action-btn" onclick="exportDataJson()">📥 Export Data (JSON)</button>
-            <button style="background:#047857; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+            <button style="background:#1e293b; color:#fff; border:1px solid var(--border-color); padding:10px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
             <input type="file" id="importFile" style="display:none" accept=".json" onchange="importDataJson(event)">
         </div>
 
