@@ -234,31 +234,71 @@
             padding: 12px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
+        
+        /* Sleek, uniform transaction card layout */
         .list-card {
             background-color: var(--card-bg);
-            padding: 14px;
-            border-radius: 10px;
-            margin-bottom: 8px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid var(--border-color);
+            gap: 8px;
         }
-        .list-card div span {
+        .list-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .list-card-info strong {
             display: block;
-            font-size: 0.82rem;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list-card-info span {
+            display: block;
+            font-size: 0.78rem;
             font-weight: 500;
             color: #cbd5e1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list-card-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .list-card-amount {
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-align: right;
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         .btn-group button {
-            width: auto;
-            padding: 6px 10px;
-            margin-left: 4px;
-            font-size: 0.75rem;
-            margin-bottom: 0;
+            width: 48px;
+            height: 22px;
+            padding: 0;
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .edit-btn { background-color: var(--accent-gold); color: #064e3b; font-weight: bold; }
-        .del-btn { background-color: #ef4444; color: #fff; font-weight: bold; }
+        .edit-btn { background-color: var(--accent-gold); color: #064e3b; }
+        .del-btn { background-color: #ef4444; color: #fff; }
         
         .modal {
             display: none;
@@ -543,7 +583,7 @@
         mr: { dash: "डॅशबोर्ड", tx: "व्यवहार", budgets: "बजेट", categories: "सेटिंग्ज", audit: "ऑडिट" },
         gu: { dash: "ડેશબોર્ડ", tx: "વ્યવહારો", budgets: "બજેટ", categories: "સેટિંગ્સ", audit: "ઓડિટ" },
         bn: { dash: "ড্যাশবোর্ড", tx: "লেনদেন", budgets: "বাজেট", categories: "সেটিংস", audit: "অডিট" },
-        pa: { dash: "ਡੈਸ਼ਬોર્ਡ", tx: "ਲੈਣ-ਦੇਣ", budgets: "ਬਜਟ", categories: "ਸੈਟਿੰਗਾਂ", audit: "ਆਡਿਟ" },
+        pa: { dash: "ਡੈਸ਼ਬੋਰਡ", tx: "ਲੈਣ-ਦੇਣ", budgets: "ਬਜਟ", categories: "ਸੈਟਿੰਗਾਂ", audit: "ਆਡਿਟ" },
         ta: { dash: "டாஷ்போர்டு", tx: "பரிவர்த்தனைகள்", budgets: "பட்ஜெட்", categories: "அமைப்புகள்", audit: "தணிக்கை" },
         te: { dash: "డాష్‌బోర్డ్", tx: "లావాదేవీలు", budgets: "బడ్జెట్", categories: "సెట్టింగ్‌లు", audit: "ఆడిట్" },
         ur: { dash: "ڈیش بورڈ", tx: "لین دین", budgets: "بجٹ", categories: "ترتیبات", audit: "آڈٹ" },
@@ -615,7 +655,6 @@
         const yearSelect = document.getElementById('filterYear');
         const monthSelect = document.getElementById('filterMonth');
         
-        // If already populated, do not overwrite selections to prevent resetting inputs/focus
         if (yearSelect.options.length > 0) return;
 
         let currentYear = new Date().getFullYear();
@@ -640,7 +679,6 @@
         const select = document.getElementById('txCategory');
         const modalSelect = document.getElementById('modalCategorySelect');
         
-        // Preserve current selections if user is interacting
         let currentTxCat = select.value;
         let currentModalCat = modalSelect.value;
 
@@ -678,7 +716,6 @@
         }
     }
 
-    // Pass force=true when structural settings/categories change, false during normal typing/re-renders
     function updateUI(forceDropdowns = false) {
         if (forceDropdowns || document.getElementById('filterYear').options.length === 0) {
             initDateFilters();
@@ -763,12 +800,12 @@
         transactions.forEach((t, idx) => {
             txHtml += `
                 <li class="list-card">
-                    <div>
+                    <div class="list-card-info">
                         <strong>${t.title}</strong>
-                        <span>${t.category} | ${t.date || 'No Date'} | ${t.type.toUpperCase()}</span>
+                        <span>${t.category} | ${t.date || 'No Date'}</span>
                     </div>
-                    <div style="display:flex; align-items:center;">
-                        <span style="color:${t.type === 'income' ? '#34d399' : '#ff6b6b'}; font-weight:bold; margin-right:8px;">
+                    <div class="list-card-right">
+                        <span class="list-card-amount" style="color:${t.type === 'income' ? '#34d399' : '#ff6b6b'};">
                             ${t.type === 'income' ? '+' : '-'}${currentCurrency} ${parseFloat(t.amount).toLocaleString()}
                         </span>
                         <div class="btn-group">
@@ -785,7 +822,10 @@
             let limitTxt = cat === 'Salary' ? 'Source' : `Limit: ${currentCurrency} ${(categoryBudgets[cat]||1000).toLocaleString()}`;
             catHtml += `
                 <li class="list-card">
-                    <div><strong>${cat}</strong><span>${limitTxt}</span></div>
+                    <div class="list-card-info">
+                        <strong>${cat}</strong>
+                        <span>${limitTxt}</span>
+                    </div>
                     <div class="btn-group">
                         <button class="edit-btn" onclick="editCat(${idx})">Edit</button>
                         <button class="del-btn" onclick="delCat(${idx})">Del</button>
@@ -952,7 +992,6 @@
         }
     }
 
-    // Initial call to render UI on load
     updateUI(true);
 </script>
 
