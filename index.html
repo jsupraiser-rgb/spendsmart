@@ -294,7 +294,7 @@
         }
         .tally-table th {
             background-color: #064032;
-            color: var(--accent-gold);
+            color: #fbbf24;
         }
     </style>
 </head>
@@ -304,7 +304,6 @@
     <div class="top-header">
         <h1>SmartSpends</h1>
         <div class="header-controls">
-            <!-- Language Dropdown (4 to 7 characters wide) -->
             <select id="langSelect" class="medium-select" onchange="changeLanguage(this.value)">
                 <option value="en">English</option>
                 <option value="hi">हिन्दी</option>
@@ -323,7 +322,6 @@
                 <option value="ja">日本語</option>
                 <option value="ar">العربية</option>
             </select>
-            <!-- Currency Symbol Dropdown -->
             <select id="headerCurrencySelect" class="medium-select" onchange="headerCurrencyChange(this.value)">
                 <option value="€">EUR (€)</option>
                 <option value="د.إ">AED (د.إ)</option>
@@ -354,8 +352,8 @@
         </div>
 
         <div style="display:flex; gap:8px; margin-bottom:14px;">
-            <select id="filterYear" onchange="updateUI()" style="margin:0;"></select>
-            <select id="filterMonth" onchange="updateUI()" style="margin:0;"></select>
+            <select id="filterYear" onchange="updateUI(false)" style="margin:0;"></select>
+            <select id="filterMonth" onchange="updateUI(false)" style="margin:0;"></select>
         </div>
 
         <div class="section-header">
@@ -545,7 +543,7 @@
         mr: { dash: "डॅशबोर्ड", tx: "व्यवहार", budgets: "बजेट", categories: "सेटिंग्ज", audit: "ऑडिट" },
         gu: { dash: "ડેશબોર્ડ", tx: "વ્યવહારો", budgets: "બજેટ", categories: "સેટિંગ્સ", audit: "ઓડિટ" },
         bn: { dash: "ড্যাশবোর্ড", tx: "লেনদেন", budgets: "বাজেট", categories: "সেটিংস", audit: "অডিট" },
-        pa: { dash: "ਡੈਸ਼ਬੋਰਡ", tx: "ਲੈਣ-ਦੇਣ", budgets: "ਬਜਟ", categories: "ਸੈਟਿੰਗਾਂ", audit: "ਆਡਿਟ" },
+        pa: { dash: "ਡੈਸ਼ਬોર્ਡ", tx: "ਲੈਣ-ਦੇਣ", budgets: "ਬਜਟ", categories: "ਸੈਟਿੰਗਾਂ", audit: "ਆਡਿਟ" },
         ta: { dash: "டாஷ்போர்டு", tx: "பரிவர்த்தனைகள்", budgets: "பட்ஜெட்", categories: "அமைப்புகள்", audit: "தணிக்கை" },
         te: { dash: "డాష్‌బోర్డ్", tx: "లావాదేవీలు", budgets: "బడ్జెట్", categories: "సెట్టింగ్‌లు", audit: "ఆడిట్" },
         ur: { dash: "ڈیش بورڈ", tx: "لین دین", budgets: "بجٹ", categories: "ترتیبات", audit: "آڈٹ" },
@@ -568,7 +566,7 @@
         currentCurrency = val;
         document.getElementById('customCurrencyInput').value = currentCurrency;
         localStorage.setItem('ss_currency', currentCurrency);
-        updateUI();
+        updateUI(false);
     }
 
     function applyTranslations() {
@@ -588,7 +586,7 @@
         
         let btn = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick').includes(tabName));
         if(btn) btn.classList.add('active');
-        updateUI();
+        updateUI(false);
     }
 
     function onCountryChange(code) {
@@ -599,7 +597,7 @@
             document.getElementById('customCurrencyInput').value = currentCurrency;
             document.getElementById('headerCurrencySelect').value = ['€', 'د.إ', 'ر.س', 'ر.ق', 'د.ك', 'ر.ع.', 'د.ب', '₹', '$', '£', '¥'].includes(currentCurrency) ? currentCurrency : '';
             localStorage.setItem('ss_currency', currentCurrency);
-            updateUI();
+            updateUI(false);
         }
     }
 
@@ -609,7 +607,7 @@
             currentCurrency = typed;
             localStorage.setItem('ss_currency', currentCurrency);
             document.getElementById('headerCurrencySelect').value = '';
-            updateUI();
+            updateUI(false);
         }
     }
 
@@ -617,8 +615,8 @@
         const yearSelect = document.getElementById('filterYear');
         const monthSelect = document.getElementById('filterMonth');
         
-        let prevY = yearSelect.value;
-        let prevM = monthSelect.value;
+        // If already populated, do not overwrite selections to prevent resetting inputs/focus
+        if (yearSelect.options.length > 0) return;
 
         let currentYear = new Date().getFullYear();
         let years = [currentYear, currentYear - 1, currentYear - 2];
@@ -626,9 +624,6 @@
         let yHtml = '<option value="all">All Years</option>';
         years.forEach(y => { yHtml += `<option value="${y}">${y}</option>`; });
         yearSelect.innerHTML = yHtml;
-        if(prevY && Array.from(yearSelect.options).some(o => o.value === prevY)) {
-            yearSelect.value = prevY;
-        }
 
         const months = [
             {val: 'all', name: 'All Months'}, {val: '01', name: 'January'}, {val: '02', name: 'February'},
@@ -639,14 +634,16 @@
         let mHtml = '';
         months.forEach(m => { mHtml += `<option value="${m.val}">${m.name}</option>`; });
         monthSelect.innerHTML = mHtml;
-        if(prevM && Array.from(monthSelect.options).some(o => o.value === prevM)) {
-            monthSelect.value = prevM;
-        }
     }
 
     function updateDropdowns() {
         const select = document.getElementById('txCategory');
         const modalSelect = document.getElementById('modalCategorySelect');
+        
+        // Preserve current selections if user is interacting
+        let currentTxCat = select.value;
+        let currentModalCat = modalSelect.value;
+
         select.innerHTML = '';
         modalSelect.innerHTML = '';
 
@@ -656,6 +653,9 @@
             modalSelect.add(new Option(cat, cat));
         });
         select.add(new Option('Salary', 'Salary'));
+
+        if(currentTxCat) select.value = currentTxCat;
+        if(currentModalCat) modalSelect.value = currentModalCat;
     }
 
     function openBudgetModal() {
@@ -674,13 +674,16 @@
         if (!isNaN(val)) {
             categoryBudgets[cat] = val;
             closeBudgetModal();
-            updateUI();
+            updateUI(true);
         }
     }
 
-    function updateUI() {
-        initDateFilters();
-        updateDropdowns();
+    // Pass force=true when structural settings/categories change, false during normal typing/re-renders
+    function updateUI(forceDropdowns = false) {
+        if (forceDropdowns || document.getElementById('filterYear').options.length === 0) {
+            initDateFilters();
+            updateDropdowns();
+        }
         applyTranslations();
 
         let selYear = document.getElementById('filterYear').value || 'all';
@@ -858,7 +861,7 @@
                     currentCountry = json.currentCountry;
                     document.getElementById('countrySelect').value = currentCountry;
                 }
-                updateUI();
+                updateUI(true);
                 alert('Data imported successfully!');
             } catch(err) {
                 alert('Invalid JSON file format.');
@@ -885,7 +888,7 @@
         }
         document.getElementById('txForm').reset();
         document.getElementById('txDate').valueAsDate = new Date();
-        updateUI();
+        updateUI(false);
     });
 
     function editTx(idx) {
@@ -903,7 +906,7 @@
     function delTx(idx) {
         if(confirm('Delete record?')) {
             transactions.splice(idx, 1);
-            updateUI();
+            updateUI(false);
         }
     }
 
@@ -928,7 +931,7 @@
                 document.getElementById('catSubmitBtn').textContent = 'Add Category';
             }
             document.getElementById('catForm').reset();
-            updateUI();
+            updateUI(true);
         }
     });
 
@@ -945,11 +948,12 @@
         if(confirm(`Delete ${c}?`)) {
             categories.splice(idx, 1);
             delete categoryBudgets[c];
-            updateUI();
+            updateUI(true);
         }
     }
 
-    updateUI();
+    // Initial call to render UI on load
+    updateUI(true);
 </script>
 
 </body>
