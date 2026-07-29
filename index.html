@@ -11,7 +11,7 @@
             --text-color: #ffffff;
             --accent-green: #34d399;
             --accent-gold: #fbbf24;
-            --accent-red: #ef4444;
+            --accent-red: #ff6b6b;
             --border-color: #149174;
         }
         body {
@@ -35,19 +35,24 @@
             margin-bottom: 14px;
         }
         h1 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             margin: 0;
             color: var(--accent-gold);
         }
-        .lang-select {
+        .header-controls {
+            display: flex;
+            gap: 6px;
+        }
+        .compact-select {
             background-color: #064032;
             color: var(--accent-gold);
             border: 1px solid var(--accent-gold);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 0.72rem;
             outline: none;
             font-weight: bold;
+            max-width: 95px;
         }
         .nav-bar {
             position: fixed;
@@ -298,24 +303,41 @@
 <div class="container">
     <div class="top-header">
         <h1>SmartSpends</h1>
-        <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
-            <option value="en">English</option>
-            <option value="hi">हिंदी</option>
-            <option value="mr">मराठी</option>
-            <option value="gu">ગુજરાતી</option>
-            <option value="bn">বাংলা</option>
-            <option value="pa">ਪੰਜਾਬੀ</option>
-            <option value="ta">தமிழ்</option>
-            <option value="te">తెలుగు</option>
-            <option value="ur">اردو</option>
-            <option value="ru">Русский</option>
-            <option value="zh">中文</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="ja">日本語</option>
-            <option value="ar">العربية</option>
-        </select>
+        <div class="header-controls">
+            <!-- Language Dropdown -->
+            <select id="langSelect" class="compact-select" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="hi">हिंदी</option>
+                <option value="mr">मराठी</option>
+                <option value="gu">ગુજરાતી</option>
+                <option value="bn">বাংলা</option>
+                <option value="pa">ਪੰਜਾਬੀ</option>
+                <option value="ta">தமிழ்</option>
+                <option value="te">తెలుగు</option>
+                <option value="ur">اردو</option>
+                <option value="ru">Русский</option>
+                <option value="zh">中文</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="ja">日本語</option>
+                <option value="ar">العربية</option>
+            </select>
+            <!-- Currency Quick Dropdown -->
+            <select id="headerCurrencySelect" class="compact-select" onchange="headerCurrencyChange(this.value)">
+                <option value="€">EUR (€)</option>
+                <option value="د.إ">AED (د.إ)</option>
+                <option value="ر.س">SAR (ر.س)</option>
+                <option value="ر.ق">QAR (ر.ق)</option>
+                <option value="د.ك">KWD (د.ك)</option>
+                <option value="ر.ع.">OMR (ر.ع.)</option>
+                <option value="د.ب">BHD (د.ب)</option>
+                <option value="₹">INR (₹)</option>
+                <option value="$">USD ($)</option>
+                <option value="£">GBP (£)</option>
+                <option value="¥">JPY/CNY (¥)</option>
+            </select>
+        </div>
     </div>
 
     <!-- TAB 1: DASHBOARD -->
@@ -326,7 +348,7 @@
             <div class="hero-balance" id="dashBalance">0</div>
             <div class="hero-grid">
                 <div><span id="lblIncome">↓ Income</span><strong id="dashIncome" style="color:#34d399;">0</strong></div>
-                <div><span id="lblExpenses">↑ Expenses</span><strong id="dashExpense" style="color:#f87171;">0</strong></div>
+                <div><span id="lblExpenses">↑ Expenses</span><strong id="dashExpense" style="color:#ff6b6b;">0</strong></div>
                 <div><span id="lblSaved">📈 Saved</span><strong id="dashSaved">0%</strong></div>
             </div>
         </div>
@@ -348,10 +370,10 @@
         <form id="txForm" class="box">
             <input type="hidden" id="editIndex" value="">
             <label>Description</label>
-            <input type="text" id="txTitle" placeholder="e.g. Groceries" required>
+            <input type="text" id="txTitle" placeholder="e.g. Groceries" autocomplete="off" required>
             
             <label>Amount</label>
-            <input type="number" id="txAmount" placeholder="0.00" step="any" required>
+            <input type="number" id="txAmount" placeholder="0.00" step="any" inputmode="decimal" required>
             
             <label>Type</label>
             <select id="txType">
@@ -432,7 +454,7 @@
             <label>Category Name</label>
             <input type="text" id="catNameInput" placeholder="e.g. Dining" required>
             <label>Monthly Limit</label>
-            <input type="number" id="catLimitInput" placeholder="0.00" step="any" required>
+            <input type="number" id="catLimitInput" placeholder="0.00" step="any" inputmode="decimal" required>
             <button type="submit" class="action-btn" id="catSubmitBtn">Add Category</button>
         </form>
         <ul id="categoryList" style="list-style:none; padding:0; margin:0;"></ul>
@@ -470,26 +492,26 @@
         <label id="modalLblCategory">Category</label>
         <select id="modalCategorySelect" style="margin-bottom:10px;"></select>
         <label id="modalLblLimit">Monthly Limit (<span class="currSign"></span>)</label>
-        <input type="number" id="modalLimitInput" placeholder="0.00" style="margin-bottom:14px;" required>
+        <input type="number" id="modalLimitInput" placeholder="0.00" inputmode="decimal" style="margin-bottom:14px;" required>
         <button class="action-btn" onclick="saveModalBudget()" id="modalBtnSave">Save</button>
     </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="nav-bar">
-    <button class="nav-item active" onclick="switchTab('dashboard', this)">
+    <button class="nav-item active" onclick="switchTab('dashboard', event)">
         <span class="nav-icon">🏠</span> <span id="navDash">Dashboard</span>
     </button>
-    <button class="nav-item" onclick="switchTab('transactions', this)">
+    <button class="nav-item" onclick="switchTab('transactions', event)">
         <span class="nav-icon">💳</span> <span id="navTx">Transactions</span>
     </button>
-    <button class="nav-item" onclick="switchTab('budgets', this)">
+    <button class="nav-item" onclick="switchTab('budgets', event)">
         <span class="nav-icon">🎯</span> <span id="navBudgets">Budgets</span>
     </button>
-    <button class="nav-item" onclick="switchTab('categories', this)">
+    <button class="nav-item" onclick="switchTab('categories', event)">
         <span class="nav-icon">🏷️</span> <span id="navCategories">Settings</span>
     </button>
-    <button class="nav-item" onclick="switchTab('audit', this)">
+    <button class="nav-item" onclick="switchTab('audit', event)">
         <span class="nav-icon">📊</span> <span id="navAudit">Audit</span>
     </button>
 </div>
@@ -497,7 +519,7 @@
 <script>
     let currentCurrency = localStorage.getItem('ss_currency') || '€';
     let currentCountry = localStorage.getItem('ss_country') || 'DE';
-    let currentLang = localStorage.getItem('ss_lang') || 'de';
+    let currentLang = localStorage.getItem('ss_lang') || 'en';
 
     let transactions = JSON.parse(localStorage.getItem('ss_transactions')) || [
         { title: 'Wohnungsmiete', amount: 850, type: 'expense', category: 'Housing', date: '2026-06-15' },
@@ -513,6 +535,7 @@
 
     document.getElementById('countrySelect').value = currentCountry;
     document.getElementById('customCurrencyInput').value = currentCurrency;
+    document.getElementById('headerCurrencySelect').value = ['€', 'د.إ', 'ر.س', 'ر.ق', 'د.ك', 'ر.ع.', 'د.ب', '₹', '$', '£', '¥'].includes(currentCurrency) ? currentCurrency : '€';
     document.getElementById('langSelect').value = currentLang;
     document.getElementById('txDate').valueAsDate = new Date();
 
@@ -532,13 +555,20 @@
         fr: { dash: "Tableau", tx: "Transactions", budgets: "Budgets", categories: "Paramètres", audit: "Audit" },
         de: { dash: "Übersicht", tx: "Transaktionen", budgets: "Budgets", categories: "Einstellungen", audit: "Prüfung" },
         ja: { dash: "ダッシュボード", tx: "取引", budgets: "予算", categories: "設定", audit: "監査" },
-        ar: { dash: "الرئيسية", tx: "المعاملات", budgets: "الميزانيات", categories: "الفئات", audit: "تدقيق" }
+        ar: { dash: "الرئيسية", tx: "المعاملات", budgets: "الميزانيات", categories: "الإعدادات", audit: "تدقيق" }
     };
 
     function changeLanguage(lang) {
         currentLang = lang;
         localStorage.setItem('ss_lang', currentLang);
         applyTranslations();
+    }
+
+    function headerCurrencyChange(val) {
+        currentCurrency = val;
+        document.getElementById('customCurrencyInput').value = currentCurrency;
+        localStorage.setItem('ss_currency', currentCurrency);
+        updateUI();
     }
 
     function applyTranslations() {
@@ -550,11 +580,15 @@
         document.getElementById('navAudit').textContent = t.audit;
     }
 
-    function switchTab(tabName, btnElement) {
+    function switchTab(tabName, event) {
+        if(event) event.preventDefault();
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById('tab-' + tabName).classList.add('active');
-        btnElement.classList.add('active');
+        
+        // Find correct nav item button and activate
+        let btn = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick').includes(tabName));
+        if(btn) btn.classList.add('active');
         updateUI();
     }
 
@@ -564,6 +598,7 @@
         if (countryCurrencyMap[code]) {
             currentCurrency = countryCurrencyMap[code];
             document.getElementById('customCurrencyInput').value = currentCurrency;
+            document.getElementById('headerCurrencySelect').value = ['€', 'د.إ', 'ر.س', 'ر.ق', 'د.ك', 'ر.ع.', 'د.ب', '₹', '$', '£', '¥'].includes(currentCurrency) ? currentCurrency : '';
             localStorage.setItem('ss_currency', currentCurrency);
             updateUI();
         }
@@ -574,6 +609,7 @@
         if(typed !== '') {
             currentCurrency = typed;
             localStorage.setItem('ss_currency', currentCurrency);
+            document.getElementById('headerCurrencySelect').value = '';
             updateUI();
         }
     }
@@ -730,7 +766,7 @@
                         <span>${t.category} | ${t.date || 'No Date'} | ${t.type.toUpperCase()}</span>
                     </div>
                     <div style="display:flex; align-items:center;">
-                        <span style="color:${t.type === 'income' ? '#34d399' : '#f87171'}; font-weight:bold; margin-right:8px;">
+                        <span style="color:${t.type === 'income' ? '#34d399' : '#ff6b6b'}; font-weight:bold; margin-right:8px;">
                             ${t.type === 'income' ? '+' : '-'}${currentCurrency} ${parseFloat(t.amount).toLocaleString()}
                         </span>
                         <div class="btn-group">
@@ -784,7 +820,7 @@
         Object.keys(yearlyData).sort().reverse().forEach(y => {
             let d = yearlyData[y];
             let net = d.inc - d.exp;
-            yTableHtml += `<tr><td>${y}</td><td style="color:#34d399">+${currentCurrency} ${d.inc.toLocaleString()}</td><td style="color:#f87171">-${currentCurrency} ${d.exp.toLocaleString()}</td><td style="font-weight:bold">${currentCurrency} ${net.toLocaleString()}</td></tr>`;
+            yTableHtml += `<tr><td>${y}</td><td style="color:#34d399">+${currentCurrency} ${d.inc.toLocaleString()}</td><td style="color:#ff6b6b">-${currentCurrency} ${d.exp.toLocaleString()}</td><td style="font-weight:bold">${currentCurrency} ${net.toLocaleString()}</td></tr>`;
         });
         document.querySelector('#yearlyTable tbody').innerHTML = yTableHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
 
@@ -792,7 +828,7 @@
         Object.keys(monthlyData).sort().reverse().forEach(ym => {
             let d = monthlyData[ym];
             let net = d.inc - d.exp;
-            mTableHtml += `<tr><td>${ym}</td><td style="color:#34d399">+${currentCurrency} ${d.inc.toLocaleString()}</td><td style="color:#f87171">-${currentCurrency} ${d.exp.toLocaleString()}</td><td style="font-weight:bold">${currentCurrency} ${net.toLocaleString()}</td></tr>`;
+            mTableHtml += `<tr><td>${ym}</td><td style="color:#34d399">+${currentCurrency} ${d.inc.toLocaleString()}</td><td style="color:#ff6b6b">-${currentCurrency} ${d.exp.toLocaleString()}</td><td style="font-weight:bold">${currentCurrency} ${net.toLocaleString()}</td></tr>`;
         });
         document.querySelector('#monthlyTable tbody').innerHTML = mTableHtml || '<tr><td colspan="4" style="text-align:center;">No data available</td></tr>';
     }
@@ -862,7 +898,7 @@
         document.getElementById('txDate').value = t.date || new Date().toISOString().slice(0,10);
         document.getElementById('editIndex').value = idx;
         document.getElementById('formSubmitBtn').textContent = 'Update Transaction';
-        switchTab('transactions', document.querySelectorAll('.nav-item')[1]);
+        switchTab('transactions');
     }
 
     function delTx(idx) {
